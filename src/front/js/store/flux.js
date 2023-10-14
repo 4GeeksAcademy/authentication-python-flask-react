@@ -99,6 +99,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log(error)
 				})
 			},
+
+			logout: () => {
+				localStorage.removeItem("token");
+				setStore({ token: null });
+				window.location.href = "/login";
+			},
 		}
 	};
 };
