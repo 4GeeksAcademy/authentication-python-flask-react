@@ -1,3 +1,5 @@
+import { redirect } from "react-router-dom";
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -13,7 +15,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+
+			token: null
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -46,7 +50,55 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
-			}
+			},
+
+			verifyIfUserLoggedIn: () => {
+				const token = localStorage.getItem('token');
+				if (token) setStore({ token: token });
+			},
+
+			signup: (email, password) => {
+				var options = {
+					method: 'POST',
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email: email, password: password })
+				};
+
+				fetch(process.env.BACKEND_URL + 'api/signup', options)
+				.then(response => {
+					if(response.ok) return response.json()
+					else throw Error('Something went wrong')
+				})
+				.then(data => {
+					console.log(data)
+				})
+
+				.catch(error => {
+					console.log(error)
+				})
+			},
+
+			login: (email, password) => {
+				var options = {
+					method: 'POST',
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email: email, password: password })
+				};
+
+				fetch(process.env.BACKEND_URL + 'api/login', options)
+				.then(response => {
+					if(response.ok) return response.json()
+					else throw Error('Something went wrong')
+				})
+				.then(data => {
+					localStorage.setItem("token", data.token);
+					setStore({ token: data.token })
+				})
+
+				.catch(error => {
+					console.log(error)
+				})
+			},
 		}
 	};
 };
